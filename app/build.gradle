@@ -1,0 +1,89 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        // This plugin helps Android Studio find Dagger's generated classes
+        classpath 'com.neenbedankt.gradle.plugins:android-apt:1.4'
+    }
+}
+
+apply plugin: 'com.android.application'
+apply plugin: 'com.neenbedankt.android-apt'
+
+configurations.all {
+    resolutionStrategy {
+        force 'com.android.support:support-annotations:23.0.1'
+        force 'org.hamcrest:hamcrest-core:1.3'
+    }
+}
+
+android {
+    compileSdkVersion 21
+    buildToolsVersion "21.1.2"
+
+    defaultConfig {
+        applicationId "com.example.yuriy.dependencyinjectioncomparison"
+        minSdkVersion 21
+        targetSdkVersion 21
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    packagingOptions {
+        exclude 'META-INF/LICENSE'
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    testCompile 'junit:junit:4.12'
+    compile 'com.android.support:appcompat-v7:21.0.3+'
+    //Roboguice start
+    compile 'org.roboguice:roboguice:3.+'
+    provided 'org.roboguice:roboblender:3.+'
+    //Roboguice end
+
+    //Espresso start
+    androidTestCompile 'com.android.support.test:runner:0.3'
+    androidTestCompile 'com.android.support.test:rules:0.3'
+    androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.1'
+    //Espresso end
+    //Junit start
+    androidTestCompile 'junit:junit:4.12'
+    //Junit end
+    //Mockito start
+    //this we need to deploy mockito mocks
+    androidTestCompile 'com.google.dexmaker:dexmaker-mockito:1.0'
+    androidTestCompile 'org.mockito:mockito-core:1.10.17'
+    //Mockito end
+
+    //Dagger2 start
+    // https://github.com/google/dagger
+    compile ('com.google.dagger:dagger:2.0.1'){
+        //this we need here because Roboguice already defines javax.inject. Hate this shit!
+        exclude module: 'javax.inject'
+    }
+    apt 'com.google.dagger:dagger-compiler:2.0.1'
+    provided 'javax.annotation:jsr250-api:1.0'
+
+    androidTestCompile 'com.google.dagger:dagger:2.0.1'
+    androidTestApt 'com.google.dagger:dagger-compiler:2.0.1'
+
+    testCompile ('com.google.dagger:dagger:2.0.1'){
+        //this we need here because Roboguice already defines javax.inject. Hate this shit!
+        exclude module: 'javax.inject'
+    }
+    testCompile 'com.google.dagger:dagger-compiler:2.0.1'
+    //Dagger2 end
+
+    //testApt 'com.google.dagger:dagger-compiler:2.0' // Waiting for gradle plugin 1.4.x
+    // https://bitbucket.org/hvisser/android-apt/issue/22/dagger-robolectric-gradle-apt-source-not
+}

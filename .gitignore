@@ -25,3 +25,9 @@ proguard/
 
 # Log Files
 *.log
+DependencyInjectionComparison.iml
+.idea
+gradle/
+gradlew
+gradlew.bat
+app/app.iml
